@@ -1,0 +1,423 @@
+Q1: Linear Regression (Uber Fare Prediction)
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_squared_error
+
+df = pd.read_csv("uber.csv")
+
+if 'Unnamed: 0' in df.columns:
+    df.drop(columns=['Unnamed: 0'], inplace=True)
+
+df = df.dropna()
+
+df['pickup_datetime'] = pd.to_datetime(df['pickup_datetime'], utc=True)
+df['hour'] = df['pickup_datetime'].dt.hour
+
+df = df.drop(['key', 'pickup_datetime'], axis=1)
+
+# Remove outliers
+df = df[(df['fare_amount'] > 0) & (df['fare_amount'] < 200)]
+
+sns.boxplot(df['fare_amount'])
+plt.show()
+
+sns.heatmap(df.corr(), annot=True)
+plt.show()
+
+X = df.drop('fare_amount', axis=1)
+y = df['fare_amount']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("R2 Score:", r2_score(y_test, y_pred))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
+
+
+------------------------------------------------------------------------------------------------
+
+
+
+Q2: Random Forest Regression (Uber Fare)
+
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_squared_error
+
+df = pd.read_csv("uber.csv")
+
+if 'Unnamed: 0' in df.columns:
+    df.drop(columns=['Unnamed: 0'], inplace=True)
+
+df = df.dropna()
+
+df['pickup_datetime'] = pd.to_datetime(df['pickup_datetime'], utc=True)
+df['hour'] = df['pickup_datetime'].dt.hour
+
+df = df.drop(['key', 'pickup_datetime'], axis=1)
+
+df = df[(df['fare_amount'] > 0) & (df['fare_amount'] < 200)]
+
+X = df.drop('fare_amount', axis=1)
+y = df['fare_amount']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+rf = RandomForestRegressor(n_estimators=100)
+rf.fit(X_train, y_train)
+
+y_pred = rf.predict(X_test)
+
+print("R2 Score:", r2_score(y_test, y_pred))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
+
+------------------------------------------------------------------------------------------------
+
+
+Q3: KNN for Email Spam Detection
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score
+
+df = pd.read_csv("emails (2).csv")
+df = df.drop(columns='Email No.')
+
+X = df.drop(columns=['Prediction'])
+y = df['Prediction']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+
+------------------------------------------------------------------------------------------------
+Q4: SVM for Email Spam Detection
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score
+
+df = pd.read_csv("emails (2).csv")
+df = df.drop(columns='Email No.')
+
+X = df.drop(columns=['Prediction'])
+y = df['Prediction']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+model = SVC(kernel='linear')
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+
+
+
+
+------------------------------------------------------------------------------------------------
+
+Q5: ANN for Churn Prediction
+
+import pandas as pd 
+df = pd.read_csv("BankChurners.csv")
+df.head()
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df = df.drop("Education_Level" , axis = 1)
+df = df.drop("Marital_Status" , axis =1)
+df.head()
+df.describe()
+df["Attrition_Flag"] = le.fit_transform(df["Attrition_Flag"])
+df["Gender"] = le.fit_transform(df["Gender"])
+df["Card_Category"] = le.fit_transform(df["Card_Category"])
+df["Income_Category"] = le.fit_transform(df["Income_Category"])
+df["Income_Category"].head()
+X = df.drop("Attrition_Flag" , axis = 1)
+y = df["Attrition_Flag"]
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+from sklearn.model_selection import train_test_split 
+X_train , X_test , y_train , y_test = train_test_split(X,y,test_size = 0.2 , random_state = 42)
+X_train_sc = sc.fit_transform(X_train) 
+X_test_sc = sc.fit_transform(X_test)
+pip install tensorflow
+import tensorflow as tf
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.layers import Dense, Dropout
+model = Sequential([
+    Dense(64, activation ="relu" , input_shape = (X_train.shape[1],)),
+    Dropout(0.30),
+    Dense(32 , activation ="relu"),
+    Dropout(0.2),
+    Dense(1,activation="sigmoid")
+])
+model.compile(optimizer = "adam" , loss = "binary_crossentropy" , metrics = ["accuracy"])
+history = model.fit(X_train , y_train , epochs = 50 , batch_size = 64 , validation_data = (X_test ,y_test) , verbose = 1)
+from sklearn.metrics import accuracy_score , confusion_matrix
+y_pred = (model.predict(X_test) > 0.5).astype("int32")
+acc = accuracy_score(y_test , y_pred)
+print(acc)
+cm = confusion_matrix(y_test , y_pred)
+print(cm)
+------------------------------------------------------------------------------------------------
+
+Q6: Gradient Descent (x+3)²
+
+
+import pandas as pd 
+import matplotlib.pyplot as plt 
+import numpy as np
+def f(x):
+    return (x + 3)**2
+def df(x):
+    return 2*(x + 3)
+x = 2
+alpha = 0.1
+iterations = 50 
+x_values = [x]
+y_values = [f(x)]
+print("Iterations\t\t x\t\t \t\tf(x)")
+for i in range(iterations):
+    gradient = df(x)
+    x = x - alpha * gradient
+    x_values.append(x)
+    y_values.append(f(x))
+
+    print(f"{i+1}\t\t {x} \t\t {f(x)}")
+print("local minima occurs near X " , round(x,4))
+x_curve = np.linspace(-8,5,100)
+y_curve = f(x_curve)
+plt.plot(x_curve , y_curve , label ="f(x) = (x + 3) ^ 2")
+plt.scatter(x_values , y_values , color = "red" , label = "Gradient desecnt Steps")
+plt.plot(x_values , y_values)
+plt.show()
+------------------------------------------------------------------------------------------------
+
+
+
+
+Q7: KNN on diabetes.csv
+
+
+import pandas as pd
+import numpy as np
+from collections import Counter
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+df = pd.read_csv("diabetes.csv")
+
+X = df.drop("Outcome", axis=1).values
+y = df["Outcome"].values
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+def euclidean_distance(x1, x2):
+    return np.sqrt(np.sum((x1 - x2)**2))
+
+def knn_predict(X_train, y_train, X_test, k):
+    predictions = []
+    for test_point in X_test:
+        distances = []
+        for i in range(len(X_train)):
+            distances.append((euclidean_distance(test_point, X_train[i]), y_train[i]))
+        distances.sort(key=lambda x: x[0])
+        k_nearest = distances[:k]
+        labels = [label for _, label in k_nearest]
+        predictions.append(Counter(labels).most_common(1)[0][0])
+    return np.array(predictions)
+
+y_pred = knn_predict(X_train, y_train, X_test, k=5)
+
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Error Rate:", 1 - accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+------------------------------------------------------------------------------------------------
+
+Q8: K-Means Clustering
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+df = pd.read_csv('sales_data_sample.csv', encoding='latin1')
+
+X = df[['SALES','QUANTITYORDERED','PRICEEACH','MSRP']]
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+wcss = []
+for i in range(1,11):
+    kmeans = KMeans(n_clusters=i)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+plt.plot(range(1,11), wcss, marker='o')
+plt.title('Elbow Method')
+plt.xlabel('k')
+plt.ylabel('WCSS')
+plt.show()
+
+kmeans = KMeans(n_clusters=3)
+df['cluster'] = kmeans.fit_predict(X_scaled)
+
+plt.scatter(df['SALES'], df['QUANTITYORDERED'], c=df['cluster'])
+plt.show()
+
+------------------------------------------------------------------------------------------------
+
+Q9: Titanic Survival Prediction
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+df = pd.read_csv("train.csv")
+
+df['Age'] = df['Age'].fillna(df['Age'].mean())
+df['Embarked'] = df['Embarked'].fillna(df['Embarked'].mode()[0])
+
+df.drop(['PassengerId','Name','Ticket','Cabin'], axis=1, inplace=True)
+
+df = pd.get_dummies(df, drop_first=True)
+
+X = df.drop('Survived', axis=1)
+y = df['Survived']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+model = Sequential([
+    Dense(16, activation='relu', input_dim=X_train.shape[1]),
+    Dense(8, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+model.fit(X_train, y_train, epochs=50)
+
+y_pred = (model.predict(X_test) > 0.5).astype(int)
+
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+------------------------------------------------------------------------------------------------
+
+
+Q10: Gradient Descent (x+5)²
+
+import pandas as pd 
+import matplotlib.pyplot as plt 
+import numpy as np
+def f(x):
+    return (x + 3)**2
+def df(x):
+    return 2*(x + 3)
+x = 2
+alpha = 0.1
+iterations = 50 
+x_values = [x]
+y_values = [f(x)]
+print("Iterations\t\t x\t\t \t\tf(x)")
+for i in range(iterations):
+    gradient = df(x)
+    x = x - alpha * gradient
+    x_values.append(x)
+    y_values.append(f(x))
+
+    print(f"{i+1}\t\t {x} \t\t {f(x)}")
+print("local minima occurs near X " , round(x,4))
+x_curve = np.linspace(-8,5,100)
+y_curve = f(x_curve)
+plt.plot(x_curve , y_curve , label ="f(x) = (x + 3) ^ 2")
+plt.scatter(x_values , y_values , color = "red" , label = "Gradient desecnt Steps")
+plt.plot(x_values , y_values)
+plt.show()
+
+
+------------------------------------------------------------------------------------------------
+
+
+
+
+1) 
+Linear regression : from sklearn.linear_model import LinearRegression
+2)
+Random Forest : from sklearn.ensemble import RandomForestRegressor
+3) 
+KNN : from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors = )
+4) 
+SVM : from sklearn.svm import SVC
+svm = SVC(kernel = "rbf")
+
+
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.layers import Dense, Dropout
+
+
+
+
+
+
+
+
+
+
+
+
+
+
